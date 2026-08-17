@@ -131,3 +131,7 @@ was drin ist, ist das, was draußen blieb:
 
 Kurzformel: **portabel vor mächtig.** Jede Abhängigkeit, die sich hinter API, Tools oder MCP
 verstecken lässt, darf später ausgetauscht werden – jede, die es nicht kann, wurde vermieden.
+
+## Lizenz
+
+[MIT](LICENSE)
