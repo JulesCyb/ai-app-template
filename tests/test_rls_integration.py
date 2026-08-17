@@ -1,4 +1,4 @@
-"""Real isolation test against PostgreSQL + pgvector (package `pgserver`, `uv sync --group dbtest`).
+"""Real isolation test against PostgreSQL + pgvector (`pgserver`, via `uv sync --group dbtest`).
 
 Verifies what the unit tests cannot: that the RLS policies from the migration apply when the
 app works as the `app` role (no superuser, NOBYPASSRLS).
@@ -69,7 +69,7 @@ def app_settings(database_urls, monkeypatch):
 
 
 async def _seed(url: str) -> tuple[uuid.UUID, uuid.UUID]:
-    """Two tenants with one document each — as the owner, because without context RLS blocks everything."""
+    """Two tenants with one document each — as the owner; without context RLS blocks all."""
     engine = create_async_engine(url)
     tenant_a, tenant_b = uuid.uuid4(), uuid.uuid4()
     async with engine.begin() as conn:

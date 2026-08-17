@@ -1,7 +1,8 @@
 """Provider abstraction for language models.
 
 Model name in PydanticAI format "<provider>:<model>" (LLM_MODEL). If LITELLM_BASE_URL is set,
-everything goes through the LiteLLM gateway (OpenAI-compatible) — switching providers = one config line.
+everything goes through the LiteLLM gateway (OpenAI-compatible) — switching providers is one
+config line.
 Per tenant, tenants.settings["model"] can override the default (the model_name argument).
 """
 
@@ -18,7 +19,7 @@ def get_model(model_name: str | None = None) -> Model | str:
     s = get_settings()
     name = model_name or s.llm_model
     if s.litellm_base_url:
-        # Through the gateway: just the model name from litellm/config.yaml, without a provider prefix.
+        # Through the gateway: the bare model name from litellm/config.yaml, no provider prefix.
         bare = name.split(":", 1)[1] if ":" in name else name
         provider = OpenAIProvider(
             base_url=s.litellm_base_url, api_key=s.litellm_api_key or "litellm"

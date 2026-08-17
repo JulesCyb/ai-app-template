@@ -74,7 +74,7 @@ async def run_assistant(prompt: str, deps: AssistantDeps) -> str:
 
 
 def stream_assistant(prompt: str, deps: AssistantDeps):
-    """Async context manager yielding a StreamedRunResult; use with `async with` in the route handler."""
+    """Async context manager yielding a StreamedRunResult; use it via `async with` in routes."""
     return assistant.run_stream(
         prompt,
         deps=deps,

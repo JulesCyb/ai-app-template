@@ -1,7 +1,8 @@
 """FastAPI dependencies: context from the request, a tenant-bound DB session.
 
 AUTH_MODE=dev-headers reads X-Tenant-Id / X-User-Id / X-Roles from the headers — for local
-development ONLY. Implement AUTH_MODE=jwt before production (verify the OIDC token, claims -> context).
+development ONLY. Implement AUTH_MODE=jwt before production (verify the OIDC token, then
+build the context from its claims).
 """
 
 from __future__ import annotations
