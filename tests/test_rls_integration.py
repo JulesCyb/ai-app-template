@@ -149,7 +149,7 @@ async def test_app_role_cannot_delete_tenants(app_settings, database_urls):
 
 
 async def test_no_context_means_no_rows(app_settings, database_urls):
-    """Without set_config, current_setting returns NULL -> the policy blocks everything (app role)."""
+    """Without set_config, current_setting is NULL -> the policy blocks all (app role)."""
     await _seed(database_urls["migrations"])
     engine = create_async_engine(database_urls["app"])
     async with engine.connect() as conn:
