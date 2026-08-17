@@ -1,0 +1,38 @@
+"""Tracing für Agent-Läufe (Langfuse über OpenTelemetry, optional).
+
+Aktiv, sobald LANGFUSE_HOST/PUBLIC_KEY/SECRET_KEY gesetzt sind und `logfire` installiert ist
+(`uv sync --extra observability`). Kontext-Attribute (tenant_id, user_id, request_id) hängt der
+Agent-Aufruf über `metadata` an – siehe app/agents/assistant.py.
+"""
+
+from __future__ import annotations
+
+import base64
+import logging
+import os
+
+from app.config import Settings
+
+log = logging.getLogger(__name__)
+
+
+def setup_observability(settings: Settings) -> bool:
+    if not (
+        settings.langfuse_host and settings.langfuse_public_key and settings.langfuse_secret_key
+    ):
+        return False
+    auth = base64.b64encode(
+        f"{settings.langfuse_public_key}:{settings.langfuse_secret_key}".encode()
+    ).decode()
+    os.environ.setdefault(
+        "OTEL_EXPORTER_OTLP_ENDPOINT", f"{settings.langfuse_host.rstrip('/')}/api/public/otel"
+    )
+    os.environ.setdefault("OTEL_EXPORTER_OTLP_HEADERS", f"Authorization=Basic {auth}")
+    try:
+        import logfire
+    except ImportError:
+        log.warning("Langfuse konfiguriert, aber `logfire` fehlt: uv sync --extra observability")
+        return False
+    logfire.configure(service_name=settings.app_name, send_to_logfire=False)
+    logfire.instrument_pydantic_ai()
+    return True

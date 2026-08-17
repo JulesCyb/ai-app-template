@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ai-app-tools": {
+      "command": "uv",
+      "args": ["run", "python", "-m", "app.mcp.server"],
+      "env": {
+        "MCP_TENANT_ID": "<aus scripts/seed.py>",
+        "MCP_USER_ID": "<aus scripts/seed.py>"
+      }
+    }
+  }
+}
