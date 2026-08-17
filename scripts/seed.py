@@ -1,7 +1,8 @@
 """Creates the first tenant and user and prints the IDs for .env / dev headers.
 
-Deliberately runs with DATABASE_URL_MIGRATIONS (owner/superuser), because without a tenant
-context the RLS policies would block every write.
+Runs with DATABASE_URL_MIGRATIONS and sets the tenant context before writing: FORCE ROW LEVEL
+SECURITY binds even the table owner (only superusers bypass RLS), so on managed Postgres
+(RDS/Neon/Supabase) the owner role would otherwise be blocked by the policies.
 
     uv run python scripts/seed.py "My Tenant" me@example.com
 """
@@ -22,6 +23,10 @@ async def main(tenant_name: str, email: str) -> None:
     engine = create_async_engine(get_settings().database_url_migrations)
     tenant_id, user_id = uuid.uuid4(), uuid.uuid4()
     async with engine.begin() as conn:
+        # Satisfies the policies' WITH CHECK even when the role is owner-but-not-superuser.
+        await conn.execute(
+            text("SELECT set_config('app.tenant_id', :tid, true)"), {"tid": str(tenant_id)}
+        )
         await conn.execute(
             text("INSERT INTO tenants (id, name) VALUES (:id, :name)"),
             {"id": tenant_id, "name": tenant_name},

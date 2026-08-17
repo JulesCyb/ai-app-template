@@ -90,12 +90,19 @@ def upgrade() -> None:
         _rls(table)
 
     # Grants for the app role (exists only if 01-init.sh has run — skip otherwise).
+    # tenants: no INSERT/DELETE for the app — creating tenants is an owner/admin operation,
+    # and DELETE would cascade an entire tenant away in one statement. UPDATE stays so the
+    # app can maintain tenants.settings.
     op.execute(
         """
         DO $$
         BEGIN
             IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'app') THEN
-                GRANT SELECT, INSERT, UPDATE, DELETE ON tenants, users, documents TO app;
+                GRANT SELECT, INSERT, UPDATE, DELETE ON users, documents TO app;
+                GRANT SELECT, UPDATE ON tenants TO app;
+                -- The default privileges from 01-init.sh grant full DML on every new table,
+                -- so the narrower tenants grant must be enforced with an explicit REVOKE.
+                REVOKE INSERT, DELETE ON tenants FROM app;
             END IF;
         END $$;
         """

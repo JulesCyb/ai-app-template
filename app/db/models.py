@@ -11,7 +11,7 @@ from datetime import datetime
 from uuid import UUID
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import DateTime, ForeignKey, String, Text, func
+from sqlalchemy import DateTime, ForeignKey, Index, String, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -34,9 +34,15 @@ class Tenant(Base):
 
 class User(Base):
     __tablename__ = "users"
+    # Mirrors migration 0001 exactly (constraint + index names included), so that a later
+    # `alembic revision --autogenerate` does not emit destructive drift.
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "email"),
+        Index("users_tenant_idx", "tenant_id"),
+    )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    tenant_id: Mapped[UUID] = mapped_column(ForeignKey("tenants.id"), index=True)
+    tenant_id: Mapped[UUID] = mapped_column(ForeignKey("tenants.id"))
     email: Mapped[str] = mapped_column(String(320))
     role: Mapped[str] = mapped_column(String(50), default="member")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -44,9 +50,10 @@ class User(Base):
 
 class Document(Base):
     __tablename__ = "documents"
+    __table_args__ = (Index("documents_tenant_idx", "tenant_id"),)
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    tenant_id: Mapped[UUID] = mapped_column(ForeignKey("tenants.id"), index=True)
+    tenant_id: Mapped[UUID] = mapped_column(ForeignKey("tenants.id"))
     title: Mapped[str] = mapped_column(String(500))
     content: Mapped[str] = mapped_column(Text)
     embedding: Mapped[list[float] | None] = mapped_column(

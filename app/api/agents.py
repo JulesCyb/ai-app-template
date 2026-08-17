@@ -14,6 +14,13 @@ from pydantic import BaseModel, Field
 from app.agents.assistant import AssistantDeps, run_assistant, stream_assistant
 from app.deps import Context
 
+
+def _sse(data: str) -> str:
+    """Frame text as one SSE event. Multi-line deltas become multiple data: lines,
+    which the client reassembles with newlines — raw interpolation would silently
+    drop every line lacking the data: prefix."""
+    return "".join(f"data: {line}\n" for line in data.split("\n")) + "\n"
+
 router = APIRouter(prefix="/agents", tags=["agents"])
 
 
@@ -36,7 +43,7 @@ async def stream(body: RunRequest, ctx: Context) -> StreamingResponse:
     async def events() -> AsyncIterator[str]:
         async with stream_assistant(body.prompt, AssistantDeps(ctx=ctx)) as result:
             async for delta in result.stream_text(delta=True):
-                yield f"data: {delta}\n\n"
+                yield _sse(delta)
         yield "event: done\ndata: \n\n"
 
     return StreamingResponse(events(), media_type="text/event-stream")

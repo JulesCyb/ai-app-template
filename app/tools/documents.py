@@ -2,7 +2,7 @@
 
 Rule: a tool receives the context, opens its own tenant-bound session, goes through the
 repository, and returns only what is needed (a snippet, not the full text). Everything returned
-here ends up in the prompt at the model provider.
+here ends up in the prompt sent to the model provider.
 """
 
 from __future__ import annotations

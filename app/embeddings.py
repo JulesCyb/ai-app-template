@@ -5,12 +5,17 @@ The dimension must match the documents.embedding column (migration 0001: 1536).
 
 from __future__ import annotations
 
+from functools import lru_cache
+
 from openai import AsyncOpenAI
 
 from app.config import get_settings
 
 
+@lru_cache
 def _client() -> AsyncOpenAI:
+    # One client per process: AsyncOpenAI holds an httpx connection pool; constructing it
+    # per call would leak connections and pay TCP+TLS setup on every search.
     s = get_settings()
     if s.litellm_base_url:
         return AsyncOpenAI(base_url=s.litellm_base_url, api_key=s.litellm_api_key or "litellm")

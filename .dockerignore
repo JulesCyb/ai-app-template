@@ -1,0 +1,11 @@
+# Never bake secrets or local state into image layers (COPY . . reads this list).
+.env
+.git
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
+dist
+node_modules
+web

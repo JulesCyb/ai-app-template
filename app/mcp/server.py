@@ -15,6 +15,7 @@ Freshness note: MCP Python SDK 2.x -> `from mcp.server.mcpserver import MCPServe
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from uuid import UUID
 
 from mcp.server.mcpserver import MCPServer
@@ -36,10 +37,16 @@ def _context_from_env() -> RequestContext:
     return RequestContext(tenant_id=UUID(s.mcp_tenant_id), user_id=UUID(s.mcp_user_id))
 
 
+# The seam for production: replace this with a function that derives tenant/user from the
+# MCP connection's authentication (OAuth/token). Anything but the env fallback MUST be
+# per-connection — a process-wide identity on a shared transport would leak tenants.
+context_provider: Callable[[], RequestContext] = _context_from_env
+
+
 @server.tool()
 async def search_documents(query: str, limit: int = 5) -> list[dict]:
     """Semantic search in the current tenant's documents."""
-    hits = await document_tools.search_documents(_context_from_env(), query, limit)
+    hits = await document_tools.search_documents(context_provider(), query, limit)
     return [hit.model_dump(mode="json") for hit in hits]
 
 

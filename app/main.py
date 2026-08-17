@@ -5,6 +5,7 @@ Start: uv run uvicorn app.main:app --reload
 
 from __future__ import annotations
 
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -12,23 +13,42 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import agents, chat, health
-from app.config import get_settings
+from app.config import Settings, get_settings
 from app.observability import setup_observability
+
+log = logging.getLogger(__name__)
+
+
+def check_auth_mode(settings: Settings) -> None:
+    """Refuse to start outside dev/test with header auth — the guardrail lives in code,
+    not only in the docs. With dev-headers, every request can impersonate any tenant."""
+    if settings.auth_mode != "dev-headers":
+        return
+    if settings.environment not in ("dev", "test"):
+        raise RuntimeError(
+            "AUTH_MODE=dev-headers is for local development only. "
+            "Implement AUTH_MODE=jwt (app/deps.py) or set ENVIRONMENT=dev."
+        )
+    log.warning("AUTH_MODE=dev-headers active — local development only.")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    setup_observability(get_settings())
+    settings = get_settings()
+    check_auth_mode(settings)
+    setup_observability(settings)
     yield
 
 
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title=settings.app_name, lifespan=lifespan)
+    origins = settings.cors_origin_list
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.cors_origin_list,
-        allow_credentials=True,
+        allow_origins=origins,
+        # Credentialed requests must never combine with a wildcard origin.
+        allow_credentials="*" not in origins,
         allow_methods=["*"],
         allow_headers=["*"],
     )

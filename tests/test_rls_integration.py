@@ -133,6 +133,21 @@ async def test_insert_for_other_tenant_is_rejected(app_settings, database_urls):
             )
 
 
+async def test_app_role_cannot_delete_tenants(app_settings, database_urls):
+    """The migration revokes INSERT/DELETE on tenants from the app role — a DELETE would
+    cascade an entire tenant away in one statement."""
+    from sqlalchemy.exc import DBAPIError, ProgrammingError
+
+    from app.context import RequestContext
+    from app.db.session import tenant_session
+
+    tenant_a, _ = await _seed(database_urls["migrations"])
+    ctx_a = RequestContext(tenant_id=tenant_a, user_id=uuid.uuid4())
+    with pytest.raises((DBAPIError, ProgrammingError)):
+        async with tenant_session(ctx_a) as session:
+            await session.execute(text("DELETE FROM tenants WHERE id = :tid"), {"tid": tenant_a})
+
+
 async def test_no_context_means_no_rows(app_settings, database_urls):
     """Without set_config, current_setting returns NULL -> the policy blocks everything (app role)."""
     await _seed(database_urls["migrations"])
