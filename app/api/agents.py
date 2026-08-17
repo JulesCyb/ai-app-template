@@ -22,6 +22,7 @@ def _sse(data: str) -> str:
     """
     return "".join(f"data: {line}\n" for line in data.split("\n")) + "\n"
 
+
 router = APIRouter(prefix="/agents", tags=["agents"])
 
 
