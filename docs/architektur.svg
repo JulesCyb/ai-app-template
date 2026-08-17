@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" role="img">
+<defs><marker id="ah06b6d4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#06b6d4"/></marker><marker id="ah22c55e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#22c55e"/></marker><marker id="ah3b82f6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#3b82f6"/></marker><marker id="ah8b5cf6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#8b5cf6"/></marker><marker id="ahec4899" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#ec4899"/></marker><marker id="ahef4444" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444"/></marker><marker id="ahf59e0b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b"/></marker></defs>
+<rect width="1200" height="900" rx="18" fill="#ffffff"/>
+<text x="590" y="48" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="30" font-weight="700" fill="#111827">ai-app-template  ·  Blueprint A</text>
+<text x="590" y="78" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="500" fill="#6b7280">Agent-Backend als API. Mandantenfähig ab Tag 1.</text>
+<rect x="40" y="105" width="760" height="118" rx="14" fill="#eef2ff" stroke="#818cf8" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.95"/>
+<text x="60" y="130" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1.4" fill="#4338ca">CLIENTS</text>
+<rect x="65" y="140" width="225" height="64" rx="11" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+<text x="177.5" y="166.1" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#1f2937">Web-Frontend</text>
+<text x="177.5" y="189.1" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="500" fill="#4b5563">Next.js + AI SDK</text>
+<rect x="310" y="140" width="225" height="64" rx="11" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+<text x="422.5" y="166.1" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#1f2937">Mobile-App</text>
+<text x="422.5" y="189.1" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="500" fill="#4b5563">Expo / PWA</text>
+<rect x="555" y="140" width="225" height="64" rx="11" fill="#ffedd5" stroke="#f59e0b" stroke-width="2"/>
+<text x="667.5" y="166.4" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#1f2937">Claude Code /</text>
+<text x="667.5" y="189.1" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="500" fill="#4b5563">Claude Desktop</text>
+<rect x="40" y="255" width="760" height="345" rx="14" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.95"/>
+<text x="60" y="280" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1.4" fill="#6d28d9">BACKEND  —  FASTAPI + PYDANTICAI</text>
+<rect x="65" y="296" width="470" height="68" rx="11" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+<text x="300.0" y="324.1" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#1f2937">HTTP-API</text>
+<text x="300.0" y="346.8" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Consolas, monospace" font-size="13" font-weight="500" fill="#4b5563">/agents/assistant/run  ·  /stream (SSE)  ·  /api/chat</text>
+<rect x="555" y="296" width="225" height="68" rx="11" fill="#ffedd5" stroke="#f59e0b" stroke-width="2"/>
+<text x="667.5" y="324.1" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#1f2937">MCP-Server</text>
+<text x="667.5" y="347.1" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Consolas, monospace" font-size="14" font-weight="500" fill="#4b5563">app/mcp</text>
+<path d="M 177 206 L 177 292" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ah3b82f6)"/>
+<path d="M 422 206 L 422 292" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ah3b82f6)"/>
+<path d="M 667 206 L 667 292" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ahf59e0b)"/>
+<rect x="65" y="392" width="715" height="50" rx="11" fill="#fef3c7" stroke="#f59e0b" stroke-width="2.5"/>
+<text x="422.5" y="423.8" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#1f2937">Kontext-Objekt:   tenant_id  ·  user_id  ·  Rollen</text>
+<path d="M 300 366 L 300 388" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ah8b5cf6)"/>
+<path d="M 667 366 L 667 388" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ahf59e0b)"/>
+<rect x="65" y="472" width="330" height="74" rx="11" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+<text x="230.0" y="503.1" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#1f2937">PydanticAI-Agent</text>
+<text x="230.0" y="526.1" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Consolas, monospace" font-size="14" font-weight="500" fill="#4b5563">app/agents</text>
+<rect x="450" y="472" width="330" height="74" rx="11" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+<text x="615.0" y="503.1" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#1f2937">Tools</text>
+<text x="615.0" y="526.1" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Consolas, monospace" font-size="14" font-weight="500" fill="#4b5563">app/tools</text>
+<path d="M 230 444 L 230 468" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ahf59e0b)"/>
+<path d="M 397 509 L 446 509" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ah8b5cf6)"/>
+<text x="70" y="578" text-anchor="start" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="500" fill="#7c6f9e">Tools laufen mit den Rechten des eingeloggten Nutzers — nie DB-Zugang ans Modell.</text>
+<rect x="40" y="632" width="760" height="208" rx="14" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.95"/>
+<text x="60" y="657" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1.4" fill="#15803d">DATEN</text>
+<rect x="450" y="668" width="330" height="64" rx="11" fill="#cffafe" stroke="#06b6d4" stroke-width="2"/>
+<text x="615.0" y="694.0" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#1f2937">Repository</text>
+<text x="615.0" y="717.1" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Consolas, monospace" font-size="14" font-weight="500" fill="#4b5563">app/repositories</text>
+<path d="M 615 548 L 615 664" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ah22c55e)"/>
+<text x="80" y="690" text-anchor="start" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#15803d">Jede Tabelle hat tenant_id.</text>
+<text x="80" y="714" text-anchor="start" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#15803d">Embeddings sind Daten.</text>
+<rect x="65" y="762" width="715" height="64" rx="11" fill="#cffafe" stroke="#0891b2" stroke-width="2.5"/>
+<text x="422.5" y="800.8" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#1f2937">PostgreSQL 17 + pgvector   —   Row-Level Security an</text>
+<path d="M 615 734 L 615 758" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ah06b6d4)"/>
+<text x="70" y="866" text-anchor="start" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="500" fill="#6b7280">Die DB-Rolle 'app' hat weder Superuser noch BYPASSRLS — sonst greift RLS nicht.</text>
+<text x="858" y="272" text-anchor="start" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#6b7280">QUERSCHNITT</text>
+<rect x="850" y="296" width="290" height="80" rx="11" fill="#ffedd5" stroke="#f59e0b" stroke-width="2"/>
+<text x="995.0" y="330.1" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#1f2937">Modelle</text>
+<text x="995.0" y="353.1" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Consolas, monospace" font-size="14" font-weight="500" fill="#4b5563">app/llm.py  ·  LiteLLM</text>
+<path d="M 804 336 L 846 336" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#ahf59e0b)"/>
+<rect x="850" y="400" width="290" height="80" rx="11" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+<text x="995.0" y="434.1" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#1f2937">Tracing</text>
+<text x="995.0" y="457.1" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="500" fill="#4b5563">Langfuse über OTel</text>
+<path d="M 804 440 L 846 440" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#ahec4899)"/>
+<rect x="850" y="668" width="290" height="80" rx="11" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+<text x="995.0" y="702.0" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#1f2937">Migrationen</text>
+<text x="995.0" y="725.1" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="500" fill="#4b5563">Alembic + RLS-Policies</text>
+<path d="M 804 708 L 846 708" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#ahef4444)"/>
+</svg>
