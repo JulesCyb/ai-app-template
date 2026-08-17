@@ -1,11 +1,22 @@
 # Deployment (blueprint A)
 
+## Before exposing anything
+
+- **Auth**: implement `AUTH_MODE=jwt` in `app/deps.py`. The startup guard refuses
+  `dev-headers` unless `ENVIRONMENT` is `dev`/`test` — set `ENVIRONMENT=prod` on servers so a
+  forgotten auth switch fails loudly instead of running open.
+- **Passwords**: set `POSTGRES_PASSWORD` and `APP_DB_PASSWORD` in `.env` (compose interpolates
+  them); the defaults are for localhost only.
+- **Ports**: compose binds 5432/8000/4000 to `127.0.0.1` — the reverse proxy (below) is the
+  only public entry point. Do not "fix" this by unbinding.
+
 ## Local / a single server (EU)
 
-- `docker compose up -d` starts Postgres and the API; `--profile gateway` adds LiteLLM.
-- Migrations run at API startup (`alembic upgrade head`) using `DATABASE_URL_MIGRATIONS`.
+- `docker compose up -d` starts Postgres, runs migrations via the one-shot `migrate` service
+  (owner role — the api container never holds the superuser DSN), then starts the API;
+  `--profile gateway` adds LiteLLM.
 - Backups: `pg_dump` via cron or provider snapshots; object storage (MinIO/Hetzner) for files.
-- Put a reverse proxy with TLS (Caddy/Traefik) in front of the API.
+- Put a reverse proxy with TLS (Caddy/Traefik) in front of the API, targeting `127.0.0.1:8000`.
 
 ## Langfuse (tracing)
 
@@ -16,9 +27,11 @@ and set `LANGFUSE_HOST` (e.g. `http://langfuse-web:3000`), `LANGFUSE_PUBLIC_KEY`
 
 ## LiteLLM (gateway)
 
-Maintain `docker/litellm/config.yaml`; virtual keys with per-tenant budgets via the LiteLLM admin
-API. Backend: `LITELLM_BASE_URL=http://litellm:4000`, `LITELLM_API_KEY=<virtual key>`,
-`LLM_MODEL=openai:claude` (the name from the config).
+Maintain `docker/litellm/config.yaml`; set `LITELLM_MASTER_KEY` in `.env` (required — the
+gateway will not start meaningfully without it) and mint virtual keys with per-tenant budgets
+via the LiteLLM admin API. Backend: `LITELLM_BASE_URL=http://litellm:4000`,
+`LITELLM_API_KEY=<virtual key>`, `LLM_MODEL=openai:claude`, `EMBEDDING_MODEL=embeddings`
+(the alias names from the config).
 
 ## Scaling / relocation
 

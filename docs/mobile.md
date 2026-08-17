@@ -2,7 +2,7 @@
 
 The app is another client of the same API — agent logic, tools, RLS, and model access stay
 unchanged. Decision and options: the `ai-app-blueprints` skill, section "Mobile clients"
-and ADR template `0005-mobile.md`.
+and ADR template `adr-0005-mobile.md`.
 
 ## Paths (check in this order)
 

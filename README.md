@@ -1,5 +1,7 @@
 # ai-app-starter
 
+[![CI](https://github.com/JulesCyb/ai-app-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/JulesCyb/ai-app-starter/actions/workflows/ci.yml)
+
 Prototype an AI-agent app today without closing a single door for tomorrow.
 
 This is a working agent backend — FastAPI + PydanticAI behind an HTTP API — that treats the web frontend, a mobile app, and Claude Code as three clients of the same interface. It is multi-tenant from day one without getting in your way while there is only one tenant, and everything vendor-shaped (model, gateway, tracing) sits behind an interface you can swap.
@@ -25,7 +27,7 @@ The agent logic runs as its own service with an HTTP API — web, mobile, and Cl
 ```bash
 uv sync --group dbtest              # dbtest only if you want the real RLS test
 cp .env.example .env                # add keys and model names
-docker compose up -d postgres
+docker compose up -d --wait postgres    # --wait blocks until the healthcheck passes
 uv run alembic upgrade head
 uv run python scripts/seed.py "My Tenant" me@example.com   # prints tenant/user IDs
 uv run uvicorn app.main:app --reload
@@ -69,7 +71,7 @@ Tests: `uv run pytest` — the RLS integration test is skipped when `pgserver` i
    run via `DATABASE_URL_MIGRATIONS`. Break this rule and RLS is void — and the bug only
    surfaces with the second tenant.
 3. **DB access only through repositories**, agent access only through tools. Tools return what is
-   needed — everything returned ends up in the prompt at the model provider.
+   needed — everything returned ends up in the prompt sent to the model provider.
 4. **Embeddings are data.** They live in the same table under the same policy, and cache keys
    include the `tenant_id`.
 
@@ -79,8 +81,9 @@ In full, with commands and conventions: [`CLAUDE.md`](CLAUDE.md).
 
 1. Copy the repo (`degit`, "Use this template", or clone without `.git`); replace the name in
    `pyproject.toml`, `CLAUDE.md`, and `.env.example`.
-2. Write `docs/adr/0001-architecture.md` — template at `docs/adr/adr-template.md`, a filled-in
-   example in the skill repo.
+2. Fill in the pre-created stub `docs/adr/0001-architecture.md` — here is a
+   [filled-in example](https://github.com/JulesCyb/ai-app-blueprints/blob/main/assets/adr-0001-example.md)
+   from the skill repo.
 3. Set `LLM_MODEL` and `EMBEDDING_MODEL`. **Careful:** the embedding dimension is baked into the
    migration — switching models means a new migration.
 4. Add your domain tables as a new migration; work through the checklist in `script.py.mako`.
@@ -107,14 +110,15 @@ the scaffold it rolls out afterwards. Both work on their own, too.
 
 ## What we decided against — and why
 
-The stack is the outcome of an August 2026 research pass (sources and full text:
-[skill repo](https://github.com/JulesCyb/ai-app-blueprints), `references/`). What stayed out
-matters as much as what went in:
+The stack is the outcome of an August 2026 research pass — sources and numbers (including the
+percentages below) live in the skill repo's
+[research digest](https://github.com/JulesCyb/ai-app-blueprints/blob/main/references/stack-2026-08.md).
+What stayed out matters as much as what went in:
 
 | Decided against | Why |
 |---|---|
 | **TypeScript full-stack** (Next.js + Mastra/AI SDK as the backend) | The team is Python-strong, and the AI ecosystem (RAG, evals, data pipelines) has a multi-year head start in Python. TypeScript stays at the UI edge — the common production pattern is a Python backend + TS frontend. A pure TS stack only pays off when the chat UI *is* the product and the backend stays thin. |
-| **A managed platform now** (Bedrock AgentCore, Azure AI Foundry) | Overhead and lock-in an own project does not need. Because the agent logic sits behind its own API and the tools speak MCP, the move there stays open — for client projects on AWS/Azure it is the intended path. |
+| **A managed platform now** (Bedrock AgentCore, Azure AI Foundry) | Overhead and lock-in that a project at this stage does not need. Because the agent logic sits behind its own API and the tools speak MCP, the move there stays open — for client projects on AWS/Azure it is the intended path. |
 | **Self-hosting the models** | Pays off with strict compliance or high, predictable throughput — neither applies here. Break-even vs. APIs comes only at very high volume. GDPR is covered via EU regions + DPA. |
 | **A dedicated vector DB** (Pinecone, Weaviate, Qdrant) | pgvector in the same Postgres carries you into the range of 5–50M vectors, and the DB choice is only 5–10% of RAG quality. One database means one RLS story for data *and* embeddings, one backup, one thing to operate. |
 | **LangGraph as the default** | Roughly 40% of "agent" tasks are a single model call with structured output. PydanticAI with tools covers most of the rest; LangGraph joins per agent only when a real state machine is needed (checkpoints, human-in-the-loop) — with an ADR. |
@@ -125,6 +129,8 @@ matters as much as what went in:
 
 Short version: **portable beats powerful.** Any dependency that can hide behind an API, a tool,
 or MCP may be swapped later — any that cannot was avoided.
+
+Issues and PRs are welcome — for changes to facts or numbers, please include a source.
 
 ## License
 
