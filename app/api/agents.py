@@ -18,7 +18,8 @@ from app.deps import Context
 def _sse(data: str) -> str:
     """Frame text as one SSE event. Multi-line deltas become multiple data: lines,
     which the client reassembles with newlines — raw interpolation would silently
-    drop every line lacking the data: prefix."""
+    drop every line lacking the data: prefix.
+    """
     return "".join(f"data: {line}\n" for line in data.split("\n")) + "\n"
 
 router = APIRouter(prefix="/agents", tags=["agents"])
