@@ -15,7 +15,7 @@ ADR gilt das ADR – dann diese Datei nachziehen.
 - Modelle: `LLM_MODEL` im Format `<provider>:<model>`, optional über LiteLLM-Gateway (`app/llm.py`)
 - Daten: PostgreSQL 17 + pgvector, RLS an, App-Rolle `app` (kein Superuser)
 - Observability: Langfuse über OTel (`app/observability.py`, optional `logfire`)
-- Frontend: keins im Repo – Next.js + Vercel AI SDK gegen `POST /api/chat`, siehe `docs/frontend.md`
+- Frontend: keins im Repo – Next.js + Vercel AI SDK gegen `POST /api/chat`, siehe `docs/frontend.md`; Mobile-App als weiterer Client, siehe `docs/mobile.md`
 - Betrieb: Docker Compose (`docker-compose.yml`), EU-Standort
 
 ## Kommandos
@@ -81,7 +81,7 @@ app/llm.py            Provider-Abstraktion; app/embeddings.py; app/observability
 migrations/           Alembic (async), 0001_initial.py als Vorlage
 tests/                pytest; RLS-Integrationstest mit pgserver
 docker/               Postgres-Init (App-Rolle), LiteLLM-Config
-docs/                 adr/, frontend.md, deployment.md
+docs/                 adr/, frontend.md, mobile.md, deployment.md
 scripts/seed.py       erster Mandant + Nutzer
 ```
 

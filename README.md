@@ -55,7 +55,7 @@ Tests: `uv run pytest` (der RLS-Test wird übersprungen, wenn `pgserver` fehlt).
 3. `LLM_MODEL`, `EMBEDDING_MODEL` (Dimension = Migration!) und ggf. LiteLLM-Config setzen.
 4. Fachtabellen als neue Migration – Checkliste im `script.py.mako` beachten.
 5. Tools in `app/tools/`, MCP-Server erweitern, Agent-Instruktionen anpassen.
-6. Frontend nach `docs/frontend.md`; Deployment nach `docs/deployment.md`.
+6. Frontend nach `docs/frontend.md`, Mobile-App nach `docs/mobile.md`; Deployment nach `docs/deployment.md`.
 7. `AUTH_MODE=jwt` implementieren, bevor irgendetwas öffentlich erreichbar ist.
 
 ## Bewusst nicht enthalten
