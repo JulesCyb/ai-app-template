@@ -1,8 +1,7 @@
-"""SQLAlchemy-Modelle. Jede Fachtabelle hat tenant_id + RLS (Migration 0001_initial.py).
+"""SQLAlchemy models. Every domain table has tenant_id + RLS (migration 0001_initial.py).
 
-
-Neue Tabelle? Vier Pflichtteile in der Migration: tenant_id NOT NULL REFERENCES tenants(id),
-Index auf tenant_id, ENABLE + FORCE ROW LEVEL SECURITY, Policy mit USING und WITH CHECK.
+New table? Four mandatory parts in the migration: tenant_id NOT NULL REFERENCES tenants(id),
+an index on tenant_id, ENABLE + FORCE ROW LEVEL SECURITY, a policy with USING and WITH CHECK.
 """
 
 from __future__ import annotations
@@ -28,7 +27,7 @@ class Tenant(Base):
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(200))
-    # Mandantenspezifische Konfiguration: Modellwahl, Prompts, Limits, Feature-Flags.
+    # Tenant-specific configuration: model choice, prompts, limits, feature flags.
     settings: Mapped[dict] = mapped_column(JSONB, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

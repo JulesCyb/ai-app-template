@@ -1,30 +1,30 @@
-# ADR-NNNN: <Titel der Entscheidung>
+# ADR-NNNN: <title of the decision>
 
-- **Status:** vorgeschlagen | akzeptiert | ersetzt durch ADR-XXXX | verworfen
-- **Datum:** YYYY-MM-DD
-- **Entscheider:** <Name(n)>
-- **Skill-Stand:** ai-app-architecture vX.Y.Z (Recherche YYYY-MM)
+- **Status:** proposed | accepted | superseded by ADR-XXXX | rejected
+- **Date:** YYYY-MM-DD
+- **Deciders:** <name(s)>
+- **Skill version:** ai-app-blueprints vX.Y.Z (research YYYY-MM)
 
-## Kontext
+## Context
 
-Welche Situation erzwingt die Entscheidung? Randbedingungen (Kunde, Cloud-Vorgabe, Datenschutz, Team, Mandanten, Budget). Was ist bereits entschieden (frühere ADRs)?
+What situation forces this decision? Constraints (client, cloud mandate, data protection, team, tenants, budget). What has already been decided (earlier ADRs)?
 
-## Optionen
+## Options
 
-1. **Option A** – kurz, mit den zwei wichtigsten Vor- und Nachteilen
-2. **Option B** – …
-3. **Option C** – …
+1. **Option A** — short, with the two most important pros and cons
+2. **Option B** — …
+3. **Option C** — …
 
-## Entscheidung
+## Decision
 
-Wir wählen **Option X**, weil … (die zwei, drei ausschlaggebenden Gründe; Verweis auf `references/blueprints.md` bzw. Recherche).
+We choose **option X** because … (the two or three decisive reasons; reference the blueprints or the research).
 
-## Konsequenzen
+## Consequences
 
-- Positiv: …
-- Negativ / Kosten: …
-- Was wird dadurch später schwerer? (Lock-in, Migrationspfad)
+- Positive: …
+- Negative / costs: …
+- What becomes harder later? (lock-in, migration path)
 
-## Überprüfen, wenn …
+## Revisit when …
 
-Kriterien, bei denen die Entscheidung neu bewertet wird (z. B. „zweiter Mandant mit vertraglicher Datentrennung", „mehr als N Anfragen/Tag", „Kunde wechselt Cloud", „Framework X erreicht 1.0").
+Criteria that trigger a re-evaluation (e.g. "second tenant with contractual data separation", "more than N requests/day", "client switches clouds", "framework X reaches 1.0").

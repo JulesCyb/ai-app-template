@@ -1,4 +1,4 @@
-"""Gemeinsame Fixtures: Kontext, Fake-Suche, TestModel – kein echter Modellaufruf, keine DB."""
+"""Shared fixtures: context, fake search, TestModel — no real model call, no DB."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ def calls() -> list[tuple[uuid.UUID, str, int]]:
 def fake_search(calls):
     async def _search(ctx: RequestContext, query: str, limit: int) -> list[DocumentHit]:
         calls.append((ctx.tenant_id, query, limit))
-        return [DocumentHit(id=uuid.uuid4(), title="Vertrag Musterkunde", snippet="…", score=0.9)]
+        return [DocumentHit(id=uuid.uuid4(), title="Acme contract", snippet="…", score=0.9)]
 
     return _search
 
@@ -38,6 +38,6 @@ def deps(ctx, fake_search) -> AssistantDeps:
 
 @pytest.fixture
 def test_model():
-    """TestModel ruft alle Tools einmal auf und antwortet deterministisch."""
+    """TestModel calls every tool once and answers deterministically."""
     with assistant.override(model=TestModel()):
         yield

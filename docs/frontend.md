@@ -1,16 +1,16 @@
-# Frontend anbinden (Next.js + Vercel AI SDK)
+# Attaching a frontend (Next.js + Vercel AI SDK)
 
-Das Backend liefert unter `POST /api/chat` das Stream-Format des Vercel AI SDK (PydanticAI
-`VercelAIAdapter`, `sdk_version=6`). Ein Next.js-Frontend braucht damit keinen eigenen Agent-Code.
+The backend serves the Vercel AI SDK stream format at `POST /api/chat` (PydanticAI
+`VercelAIAdapter`, `sdk_version=6`). A Next.js frontend therefore needs no agent code of its own.
 
-Versionen sind schnelllebig – vor dem Start aktuelle Docs prüfen (`ai`, `@ai-sdk/react`, Next.js).
+Versions move fast — check current docs before starting (`ai`, `@ai-sdk/react`, Next.js).
 
 ```bash
 npx create-next-app@latest web --ts --app --eslint --tailwind --no-src-dir
 cd web && npm i ai @ai-sdk/react
 ```
 
-Minimaler Chat (`web/app/page.tsx`, Prinzip – API-Details gegen die aktuelle SDK-Doku prüfen):
+Minimal chat (`web/app/page.tsx`, the principle — verify API details against current SDK docs):
 
 ```tsx
 "use client";
@@ -21,18 +21,18 @@ export default function Page() {
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       api: process.env.NEXT_PUBLIC_API_URL + "/api/chat",
-      headers: {                       // dev-headers – in Produktion Session/JWT
+      headers: {                       // dev headers — use session/JWT in production
         "X-Tenant-Id": process.env.NEXT_PUBLIC_DEV_TENANT_ID!,
         "X-User-Id": process.env.NEXT_PUBLIC_DEV_USER_ID!,
       },
     }),
   });
-  // messages rendern, Formular -> sendMessage({ text })
+  // render messages, form -> sendMessage({ text })
 }
 ```
 
-Hinweise:
-- CORS: `CORS_ORIGINS` im Backend auf die Frontend-URL setzen.
-- Tool-Aufrufe (`search_documents`) kommen als Tool-Parts im Stream an – anzeigen, damit Nutzer sehen, was der Agent tut.
-- In Produktion die Auth im Frontend über die Session lösen (Cookie/JWT); die dev-Header nie ausliefern.
-- Alternative ohne UI-Framework-Bindung: `POST /agents/assistant/stream` (SSE, reiner Text) oder AG-UI-Adapter von PydanticAI.
+Notes:
+- CORS: set `CORS_ORIGINS` in the backend to the frontend URL.
+- Tool calls (`search_documents`) arrive as tool parts in the stream — display them so users see what the agent is doing.
+- In production, solve auth in the frontend via the session (cookie/JWT); never ship the dev headers.
+- Alternative without a UI-framework binding: `POST /agents/assistant/stream` (SSE, plain text) or PydanticAI's AG-UI adapter.

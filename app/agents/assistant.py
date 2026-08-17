@@ -1,10 +1,10 @@
-"""Der Standard-Agent: PydanticAI mit Tools, Kontext über deps.
+"""The default agent: PydanticAI with tools, context via deps.
 
-- Kein Modell fest verdrahtet: get_model() liefert es zur Laufzeit (Provider-Abstraktion, ggf. pro
-  Mandant). Tests überschreiben mit TestModel/FunctionModel – kein echter Modellaufruf.
-- Tools sind dünne Wrapper um app/tools/*, die den Kontext aus ctx.deps holen.
-- LangGraph erst, wenn ein Ablauf zur Zustandsmaschine wird (Checkpoints, Human-in-the-Loop) –
-  dann als eigenes Modul, mit ADR.
+- No model hard-wired: get_model() resolves it at runtime (provider abstraction, per tenant if
+  needed). Tests override with TestModel/FunctionModel — no real model call.
+- Tools are thin wrappers around app/tools/* that take the context from ctx.deps.
+- LangGraph only once a flow becomes a state machine (checkpoints, human-in-the-loop) —
+  then as its own module, with an ADR.
 """
 
 from __future__ import annotations
@@ -26,9 +26,9 @@ SearchFn = Callable[[RequestContext, str, int], Awaitable[list[DocumentHit]]]
 @dataclass
 class AssistantDeps:
     ctx: RequestContext
-    # Injizierbar, damit Tests ohne Datenbank und Embeddings laufen (None = echte Suche).
+    # Injectable so tests run without a database and embeddings (None = the real search).
     search: SearchFn | None = None
-    model_name: str | None = None  # z. B. aus tenants.settings["model"]
+    model_name: str | None = None  # e.g. from tenants.settings["model"]
 
     def __post_init__(self) -> None:
         if self.search is None:
@@ -36,9 +36,9 @@ class AssistantDeps:
 
 
 INSTRUCTIONS = (
-    "Du bist der Assistent dieser Anwendung. Beantworte Fragen auf Basis der Dokumente des "
-    "Nutzers. Nutze search_documents, bevor du Fakten behauptest, und nenne die Titel der "
-    "Dokumente, auf die du dich stützt. Wenn nichts Passendes gefunden wird, sag das klar."
+    "You are this application's assistant. Answer questions based on the user's documents. "
+    "Use search_documents before stating facts, and name the titles of the documents you rely "
+    "on. If nothing relevant is found, say so clearly."
 )
 
 assistant: Agent[AssistantDeps, str] = Agent(
@@ -53,11 +53,11 @@ assistant: Agent[AssistantDeps, str] = Agent(
 async def search_documents(
     ctx: RunContext[AssistantDeps], query: str, limit: int = 5
 ) -> list[DocumentHit]:
-    """Durchsucht die Dokumente des aktuellen Nutzers semantisch.
+    """Searches the current user's documents semantically.
 
     Args:
-        query: Suchanfrage in natürlicher Sprache.
-        limit: Maximale Trefferzahl (1–20).
+        query: Search query in natural language.
+        limit: Maximum number of hits (1–20).
     """
     assert ctx.deps.search is not None
     return await ctx.deps.search(ctx.deps.ctx, query, limit)
@@ -74,7 +74,7 @@ async def run_assistant(prompt: str, deps: AssistantDeps) -> str:
 
 
 def stream_assistant(prompt: str, deps: AssistantDeps):
-    """Async-Contextmanager mit StreamedRunResult; im Route-Handler mit `async with` verwenden."""
+    """Async context manager yielding a StreamedRunResult; use with `async with` in the route handler."""
     return assistant.run_stream(
         prompt,
         deps=deps,

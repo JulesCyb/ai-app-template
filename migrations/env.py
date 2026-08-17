@@ -1,4 +1,4 @@
-"""Alembic-Umgebung (async, asyncpg). Läuft mit DATABASE_URL_MIGRATIONS (Owner-Rolle)."""
+"""Alembic environment (async, asyncpg). Runs with DATABASE_URL_MIGRATIONS (owner role)."""
 
 from __future__ import annotations
 

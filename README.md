@@ -1,137 +1,131 @@
-# ai-app-template
+# ai-app-starter
 
-Grundgerüst für Apps mit KI-Agenten: **Agent-Backend als API**, mandantenfähig ab Tag 1 – ohne dass
-es beim ersten Mandanten im Weg steht. Blueprint A aus dem Claude-Code-Skill
-**[ai-app-architecture](https://github.com/JulesCyb/claude-skills)**.
+Prototype an AI-agent app today without closing a single door for tomorrow.
+
+This is a working agent backend — FastAPI + PydanticAI behind an HTTP API — that treats the web frontend, a mobile app, and Claude Code as three clients of the same interface. It is multi-tenant from day one without getting in your way while there is only one tenant, and everything vendor-shaped (model, gateway, tracing) sits behind an interface you can swap.
 
 <p align="center">
-  <img src="docs/architektur.svg" alt="Architektur: Clients (Web, Mobile, Claude Code) rufen die FastAPI bzw. den MCP-Server, beides erzeugt ein Kontext-Objekt mit tenant_id, das durch Agent, Tools und Repository bis in die Postgres-Datenbank mit Row-Level Security gereicht wird" width="100%">
+  <img src="docs/architecture.svg" alt="Architecture: clients (web, mobile, Claude Code) call the FastAPI or the MCP server; both produce a context object with tenant_id that is passed through agent, tools, and repository down to the Postgres database with Row-Level Security" width="100%">
 </p>
 
-<p align="center"><sub><a href="https://excalidraw.com/#json=bdd8Jr5UWxFtco9ZSu_l6,Iyv85RDYAR48WVfU4o0FlA">Diagramm in Excalidraw öffnen und bearbeiten</a></sub></p>
+<p align="center"><sub><a href="https://excalidraw.com/#json=HVEtqjokzG5Qtgyo6uulN,5FEngHdy0vyeKAv4jYPyZg">Open and edit the diagram in Excalidraw</a></sub></p>
 
-> **Stand: 2026-08** (PydanticAI 2.x, MCP-SDK 2.x, FastAPI 0.14x). Vor dem Ableiten
-> `uv lock --upgrade` laufen lassen und die Modellnamen in `.env.example` sowie
-> `docker/litellm/config.yaml` aktualisieren.
+> **As of 2026-08** (PydanticAI 2.x, MCP SDK 2.x, FastAPI 0.14x). Before deriving a project,
+> run `uv lock --upgrade` and update the model names in `.env.example` and
+> `docker/litellm/config.yaml`.
 
 ---
 
-## Die Idee in vier Sätzen
+## The idea in four sentences
 
-Die Agent-Logik läuft als eigener Dienst mit HTTP-API – Web-Frontend, Mobile-App und Claude Code
-sind einfach drei Clients derselben Schnittstelle. Jeder Request erzeugt ein **Kontext-Objekt**
-(`tenant_id`, `user_id`, Rollen), das durch Agent, Tools, Repository und bis in die
-Datenbanktransaktion gereicht wird; nichts liest globalen Zustand. In der Datenbank sichert
-**Row-Level Security** die Mandantentrennung ab, nicht die Sorgfalt des Entwicklers. Und der Agent
-sieht nie eine DB-Verbindung – er kommt ausschließlich über Tools an Daten, die mit den Rechten des
-eingeloggten Nutzers laufen.
+The agent logic runs as its own service with an HTTP API — web, mobile, and Claude Code are just three clients of the same interface. Every request produces a **context object** (`tenant_id`, `user_id`, roles) that is passed through agent, tools, repository, and down into the database transaction; nothing reads global state. In the database, **Row-Level Security** enforces tenant separation — not developer discipline. And the agent never sees a DB connection: it reaches data exclusively through tools that run with the logged-in user's permissions.
 
-## Schnellstart
+## Quickstart
 
 ```bash
-uv sync --group dbtest              # dbtest nur, wenn du den echten RLS-Test willst
-cp .env.example .env                # Keys und Modellnamen eintragen
+uv sync --group dbtest              # dbtest only if you want the real RLS test
+cp .env.example .env                # add keys and model names
 docker compose up -d postgres
 uv run alembic upgrade head
-uv run python scripts/seed.py "Mein Mandant" me@example.com   # gibt Tenant-/User-ID aus
+uv run python scripts/seed.py "My Tenant" me@example.com   # prints tenant/user IDs
 uv run uvicorn app.main:app --reload
 ```
 
-Erster Aufruf (lokal reichen Dev-Header):
+First call (dev headers are enough locally):
 
 ```bash
 curl -X POST localhost:8000/agents/assistant/run \
   -H 'Content-Type: application/json' \
   -H 'X-Tenant-Id: <TENANT>' -H 'X-User-Id: <USER>' \
-  -d '{"prompt": "Was steht in meinen Dokumenten zu Kündigungsfristen?"}'
+  -d '{"prompt": "What do my documents say about notice periods?"}'
 ```
 
-Tests: `uv run pytest` – der RLS-Integrationstest wird übersprungen, wenn `pgserver` fehlt.
+Tests: `uv run pytest` — the RLS integration test is skipped when `pgserver` is missing.
 
-## Was drin ist
+## What's inside
 
-| Baustein | Datei | Zweck |
+| Building block | File | Purpose |
 |---|---|---|
-| Kontext-Objekt | `app/context.py` | `tenant_id`, `user_id`, Rollen – wird überall durchgereicht |
-| Auth (dev) | `app/deps.py` | `X-Tenant-Id`/`X-User-Id`-Header lokal; JWT-Stelle vorbereitet |
-| Mandanten-Session | `app/db/session.py` | `set_config('app.tenant_id', …)` pro Transaktion |
-| Schema + RLS | `migrations/versions/0001_initial.py` | tenants, users, documents (vector 1536), Policies, Grants |
-| App-Rolle | `docker/postgres/01-init.sh` | `app` ohne Superuser/BYPASSRLS – sonst greift RLS nicht |
-| Repository | `app/repositories/documents.py` | einziger Weg zur DB, Vektorsuche |
-| Tools | `app/tools/documents.py` | Suche mit Kontext, gemeinsam für Agent und MCP |
-| Agent | `app/agents/assistant.py` | PydanticAI-Agent, Modell zur Laufzeit, Tracing-Metadaten |
+| Context object | `app/context.py` | `tenant_id`, `user_id`, roles — passed through everywhere |
+| Auth (dev) | `app/deps.py` | `X-Tenant-Id`/`X-User-Id` headers locally; JWT slot prepared |
+| Tenant session | `app/db/session.py` | `set_config('app.tenant_id', …)` per transaction |
+| Schema + RLS | `migrations/versions/0001_initial.py` | tenants, users, documents (vector 1536), policies, grants |
+| App role | `docker/postgres/01-init.sh` | `app` without superuser/BYPASSRLS — otherwise RLS is void |
+| Repository | `app/repositories/documents.py` | the only path to the DB, vector search |
+| Tools | `app/tools/documents.py` | context-aware search, shared by agent and MCP |
+| Agent | `app/agents/assistant.py` | PydanticAI agent, model resolved at runtime, tracing metadata |
 | API | `app/api/` | `/agents/assistant/run`, `/agents/assistant/stream` (SSE), `/api/chat` (Vercel AI SDK) |
-| MCP-Server | `app/mcp/server.py` | dieselben Tools für Claude Code / Claude Desktop |
-| Modelle | `app/llm.py`, `app/embeddings.py` | Provider-Abstraktion, LiteLLM-Option |
-| Tracing | `app/observability.py` | Langfuse über OTel (optional) |
-| Tests | `tests/` | Unit (TestModel, ohne DB) + echter RLS-Test mit eingebettetem Postgres |
+| MCP server | `app/mcp/server.py` | the same tools for Claude Code / Claude Desktop |
+| Models | `app/llm.py`, `app/embeddings.py` | provider abstraction, LiteLLM option |
+| Tracing | `app/observability.py` | Langfuse via OTel (optional) |
+| Tests | `tests/` | unit (TestModel, no DB) + a real RLS test against embedded Postgres |
 
-## Die vier Regeln, die das Ding zusammenhalten
+## The four rules that hold it together
 
-1. **Jede neue Tabelle bekommt `tenant_id`** – plus Index, `FORCE ROW LEVEL SECURITY` und eine
-   Policy auf `current_setting('app.tenant_id')`. Vorlage und Checkliste stehen in
-   `migrations/versions/0001_initial.py` und `migrations/script.py.mako`.
-2. **Die App verbindet sich als Rolle `app`** – kein Superuser, `NOBYPASSRLS`. Migrationen und Seed
-   laufen über `DATABASE_URL_MIGRATIONS`. Wird diese Regel gebrochen, ist RLS wirkungslos und der
-   Fehler fällt erst beim zweiten Mandanten auf.
-3. **DB-Zugriff nur über Repositories**, Agent-Zugriff nur über Tools. Tools geben zurück, was
-   nötig ist – alles Zurückgegebene landet im Prompt beim Modellanbieter.
-4. **Embeddings sind Daten.** Sie stehen in derselben Tabelle unter derselben Policy, und
-   Cache-Schlüssel enthalten die `tenant_id`.
+1. **Every new table gets a `tenant_id`** — plus an index, `FORCE ROW LEVEL SECURITY`, and a
+   policy on `current_setting('app.tenant_id')`. Template and checklist live in
+   `migrations/versions/0001_initial.py` and `migrations/script.py.mako`.
+2. **The app connects as the `app` role** — no superuser, `NOBYPASSRLS`. Migrations and seed
+   run via `DATABASE_URL_MIGRATIONS`. Break this rule and RLS is void — and the bug only
+   surfaces with the second tenant.
+3. **DB access only through repositories**, agent access only through tools. Tools return what is
+   needed — everything returned ends up in the prompt at the model provider.
+4. **Embeddings are data.** They live in the same table under the same policy, and cache keys
+   include the `tenant_id`.
 
-Ausführlich, samt Kommandos und Konventionen: [`CLAUDE.md`](CLAUDE.md).
+In full, with commands and conventions: [`CLAUDE.md`](CLAUDE.md).
 
-## Ein eigenes Projekt daraus machen
+## Make it your own
 
-1. Repo kopieren (`degit` oder Clone ohne `.git`); Namen in `pyproject.toml`, `CLAUDE.md` und
-   `.env.example` ersetzen.
-2. `docs/adr/0001-architektur.md` schreiben – Vorlage liegt unter `docs/adr/adr-template.md`,
-   ein ausgefülltes Beispiel im Skill-Repo.
-3. `LLM_MODEL` und `EMBEDDING_MODEL` setzen. **Achtung:** die Embedding-Dimension steht in der
-   Migration – wer das Modell wechselt, braucht eine neue Migration.
-4. Fachtabellen als neue Migration anlegen, Checkliste in `script.py.mako` abarbeiten.
-5. Tools in `app/tools/` ergänzen, MCP-Server erweitern, Agent-Instruktionen anpassen.
-6. Clients anschließen: [`docs/frontend.md`](docs/frontend.md) (Next.js),
+1. Copy the repo (`degit`, "Use this template", or clone without `.git`); replace the name in
+   `pyproject.toml`, `CLAUDE.md`, and `.env.example`.
+2. Write `docs/adr/0001-architecture.md` — template at `docs/adr/adr-template.md`, a filled-in
+   example in the skill repo.
+3. Set `LLM_MODEL` and `EMBEDDING_MODEL`. **Careful:** the embedding dimension is baked into the
+   migration — switching models means a new migration.
+4. Add your domain tables as a new migration; work through the checklist in `script.py.mako`.
+5. Add tools in `app/tools/`, extend the MCP server, adjust the agent instructions.
+6. Attach clients: [`docs/frontend.md`](docs/frontend.md) (Next.js),
    [`docs/mobile.md`](docs/mobile.md) (Android/iOS), [`docs/deployment.md`](docs/deployment.md).
-7. **`AUTH_MODE=jwt` implementieren, bevor irgendetwas öffentlich erreichbar ist.** Die Dev-Header
-   sind für localhost und sonst nirgends.
+7. **Implement `AUTH_MODE=jwt` before anything is publicly reachable.** The dev headers are for
+   localhost and nowhere else.
 
-## Bewusst nicht enthalten
+## Deliberately not included
 
-| | Warum |
+| | Why |
 |---|---|
-| Frontend | Zu schnelllebig, um es hier einzufrieren – `docs/frontend.md` beschreibt den Anschluss |
-| LangGraph | Erst, wenn ein Agent wirklich eine Zustandsmaschine mit Checkpoints braucht – dann als eigenes Modul, mit ADR |
-| Langfuse-Compose | Die offizielle Compose-Datei von Langfuse einbinden, siehe `docs/deployment.md` |
-| Onboarding/Billing | Kommt mit dem zweiten Kunden, nicht vorher |
+| Frontend | Moves too fast to freeze here — `docs/frontend.md` describes how to attach one |
+| LangGraph | Only once an agent truly needs a state machine with checkpoints — then as its own module, with an ADR |
+| Langfuse compose | Use Langfuse's official compose file, see `docs/deployment.md` |
+| Onboarding/billing | Arrives with the second customer, not before |
 
-## Herkunft
+## Where it comes from
 
-Dieses Repo ist die Code-Hälfte eines Paars: **[claude-skills](https://github.com/JulesCyb/claude-skills)**
-enthält den Skill, der die Architekturentscheidung trifft und die ADRs schreibt – dieses Repo ist
-das Gerüst, das er anschließend ausrollt. Beides lässt sich auch getrennt verwenden.
+This repo is the code half of a pair: **[ai-app-blueprints](https://github.com/JulesCyb/ai-app-blueprints)**
+is the Claude Code skill that makes the architecture decision and writes the ADRs — this repo is
+the scaffold it rolls out afterwards. Both work on their own, too.
 
-## Wogegen wir uns entschieden haben – und warum
+## What we decided against — and why
 
-Der Stack ist das Ergebnis einer Recherche vom August 2026 (Quellen und Langfassung:
-[Skill-Repo](https://github.com/JulesCyb/claude-skills), `references/`). Genauso wichtig wie das,
-was drin ist, ist das, was draußen blieb:
+The stack is the outcome of an August 2026 research pass (sources and full text:
+[skill repo](https://github.com/JulesCyb/ai-app-blueprints), `references/`). What stayed out
+matters as much as what went in:
 
-| Dagegen entschieden | Warum |
+| Decided against | Why |
 |---|---|
-| **TypeScript-Full-Stack** (Next.js + Mastra/AI SDK als Backend) | Das Team ist Python-stark, und das KI-Ökosystem (RAG, Evals, Datenpipelines) hat in Python mehrere Jahre Vorsprung. TypeScript bleibt an der UI-Kante – das gängige Produktionsmuster ist Python-Backend + TS-Frontend. Ein reiner TS-Stack lohnt nur, wenn die Chat-UI das Produkt ist und das Backend dünn bleibt. |
-| **Managed-Plattform jetzt** (Bedrock AgentCore, Azure AI Foundry) | Overhead und Lock-in, den ein Eigenprojekt nicht braucht. Weil die Agent-Logik hinter einer eigenen API steckt und Tools MCP sprechen, bleibt der Umzug dorthin offen – für Kundenprojekte auf AWS/Azure ist er sogar der vorgesehene Pfad. |
-| **Self-Hosting der Modelle** | Lohnt bei strenger Compliance oder hohem, planbarem Durchsatz – beides liegt nicht vor. Der Break-even gegenüber APIs liegt erst bei sehr hohem Volumen. DSGVO ist hier über EU-Regionen + AVV abgedeckt. |
-| **Eigene Vektordatenbank** (Pinecone, Weaviate, Qdrant) | pgvector in derselben Postgres trägt bis in den Bereich von 5–50 Mio. Vektoren, und die DB-Wahl macht nur 5–10 % der RAG-Qualität aus. Eine Datenbank heißt: eine RLS-Geschichte für Daten *und* Embeddings, ein Backup, ein Betriebsmodell. |
-| **LangGraph als Default** | Rund 40 % der „Agent"-Aufgaben sind ein einzelner Modellaufruf mit Structured Output. PydanticAI mit Tools deckt den Rest weitgehend ab; LangGraph kommt pro Agent erst dazu, wenn wirklich eine Zustandsmaschine gebraucht wird (Checkpoints, Human-in-the-Loop) – dann mit ADR. |
-| **Lokale Modelle im Produkt** | Modelle laufen hinter der API (Claude/GPT/Bedrock/Azure). On-Device oder lokal nur für die Entwicklung – oder wenn Self-Hosting Pflicht würde. |
-| **CrewAI, smolagents, LangChain Classic, AutoGen/Semantic Kernel einzeln** | Verlierer der Framework-Konsolidierung 2025/26: opak oder teuer bei Multi-Agent-Pipelines, nicht Enterprise-tauglich oder von den Nachfolgern (LangGraph, Microsoft Agent Framework) abgelöst. |
-| **OpenAI Assistants API** | Sunset zum 26.08.2026 – Neubauten gehören auf die Responses API bzw. hinter die eigene Provider-Abstraktion. |
-| **Low-Code-Kern** | Ausschlusskriterium von Anfang an: Das Produkt wird mit KI-Coding-Agents in der CLI entwickelt; dafür braucht es Code, Konventionen und eine `CLAUDE.md` – keine Klickstrecken. |
+| **TypeScript full-stack** (Next.js + Mastra/AI SDK as the backend) | The team is Python-strong, and the AI ecosystem (RAG, evals, data pipelines) has a multi-year head start in Python. TypeScript stays at the UI edge — the common production pattern is a Python backend + TS frontend. A pure TS stack only pays off when the chat UI *is* the product and the backend stays thin. |
+| **A managed platform now** (Bedrock AgentCore, Azure AI Foundry) | Overhead and lock-in an own project does not need. Because the agent logic sits behind its own API and the tools speak MCP, the move there stays open — for client projects on AWS/Azure it is the intended path. |
+| **Self-hosting the models** | Pays off with strict compliance or high, predictable throughput — neither applies here. Break-even vs. APIs comes only at very high volume. GDPR is covered via EU regions + DPA. |
+| **A dedicated vector DB** (Pinecone, Weaviate, Qdrant) | pgvector in the same Postgres carries you into the range of 5–50M vectors, and the DB choice is only 5–10% of RAG quality. One database means one RLS story for data *and* embeddings, one backup, one thing to operate. |
+| **LangGraph as the default** | Roughly 40% of "agent" tasks are a single model call with structured output. PydanticAI with tools covers most of the rest; LangGraph joins per agent only when a real state machine is needed (checkpoints, human-in-the-loop) — with an ADR. |
+| **Local models in the product** | Models run behind the API (Claude/GPT/Bedrock/Azure). On-device or local only for development — or if self-hosting ever becomes mandatory. |
+| **CrewAI, smolagents, LangChain Classic, AutoGen/Semantic Kernel separately** | Losers of the 2025/26 framework consolidation: opaque or expensive in multi-agent pipelines, not enterprise-ready, or superseded by their successors (LangGraph, Microsoft Agent Framework). |
+| **OpenAI Assistants API** | Sunset on 2026-08-26 — new builds belong on the Responses API, or behind your own provider abstraction. |
+| **A low-code core** | An exclusion criterion from the start: the product is developed with AI coding agents in the CLI, which needs code, conventions, and a `CLAUDE.md` — not click paths. |
 
-Kurzformel: **portabel vor mächtig.** Jede Abhängigkeit, die sich hinter API, Tools oder MCP
-verstecken lässt, darf später ausgetauscht werden – jede, die es nicht kann, wurde vermieden.
+Short version: **portable beats powerful.** Any dependency that can hide behind an API, a tool,
+or MCP may be swapped later — any that cannot was avoided.
 
-## Lizenz
+## License
 
 [MIT](LICENSE)

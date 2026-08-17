@@ -1,8 +1,8 @@
-"""Async-Engine und mandantengebundene Sessions.
+"""Async engine and tenant-bound sessions.
 
-tenant_session() öffnet eine Transaktion und setzt app.tenant_id / app.user_id per set_config
-(is_local=true, gilt nur für diese Transaktion). Die RLS-Policies in migrations/ filtern damit.
-Ohne gesetzten Kontext liefert current_setting(..., true) NULL -> die Policies blocken alles.
+tenant_session() opens a transaction and sets app.tenant_id / app.user_id via set_config
+(is_local=true, valid for this transaction only). The RLS policies in migrations/ filter on it.
+Without a set context, current_setting(..., true) returns NULL -> the policies block everything.
 """
 
 from __future__ import annotations
@@ -41,7 +41,7 @@ def get_session_factory() -> async_sessionmaker[AsyncSession]:
 
 @asynccontextmanager
 async def tenant_session(ctx: RequestContext) -> AsyncIterator[AsyncSession]:
-    """Eine Transaktion im Kontext des Mandanten. Commit am Ende, Rollback bei Fehler."""
+    """One transaction in the tenant's context. Commit at the end, rollback on error."""
     async with get_session_factory()() as session:
         async with session.begin():
             await session.execute(

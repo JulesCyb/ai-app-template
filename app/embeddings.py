@@ -1,6 +1,6 @@
-"""Embeddings über einen OpenAI-kompatiblen Endpunkt (direkt oder über LiteLLM).
+"""Embeddings via an OpenAI-compatible endpoint (direct or through LiteLLM).
 
-Dimension muss zur Spalte documents.embedding passen (Migration 0001: 1536).
+The dimension must match the documents.embedding column (migration 0001: 1536).
 """
 
 from __future__ import annotations

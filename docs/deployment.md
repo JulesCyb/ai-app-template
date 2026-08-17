@@ -1,28 +1,28 @@
-# Deployment (Blueprint A)
+# Deployment (blueprint A)
 
-## Lokal / ein Server (EU)
+## Local / a single server (EU)
 
-- `docker compose up -d` startet Postgres und die API; `--profile gateway` zusätzlich LiteLLM.
-- Migrationen laufen beim API-Start (`alembic upgrade head`) mit `DATABASE_URL_MIGRATIONS`.
-- Backups: `pg_dump` per Cron oder Anbieter-Snapshots; Objektspeicher (MinIO/Hetzner) für Dateien.
-- Reverse Proxy mit TLS (Caddy/Traefik) vor die API.
+- `docker compose up -d` starts Postgres and the API; `--profile gateway` adds LiteLLM.
+- Migrations run at API startup (`alembic upgrade head`) using `DATABASE_URL_MIGRATIONS`.
+- Backups: `pg_dump` via cron or provider snapshots; object storage (MinIO/Hetzner) for files.
+- Put a reverse proxy with TLS (Caddy/Traefik) in front of the API.
 
-## Langfuse (Tracing)
+## Langfuse (tracing)
 
-Langfuse v3 braucht ClickHouse, Redis/Valkey und MinIO. Die offizielle Compose-Datei aus
-https://github.com/langfuse/langfuse verwenden (nicht nachbauen), im gleichen Docker-Netz starten
-und `LANGFUSE_HOST` (z. B. `http://langfuse-web:3000`), `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`
-setzen. Danach `uv sync --extra observability`.
+Langfuse v3 needs ClickHouse, Redis/Valkey, and MinIO. Use the official compose file from
+https://github.com/langfuse/langfuse (do not rebuild it), start it on the same Docker network,
+and set `LANGFUSE_HOST` (e.g. `http://langfuse-web:3000`), `LANGFUSE_PUBLIC_KEY`,
+`LANGFUSE_SECRET_KEY`. Then `uv sync --extra observability`.
 
-## LiteLLM (Gateway)
+## LiteLLM (gateway)
 
-`docker/litellm/config.yaml` pflegen; virtuelle Keys mit Budget pro Mandant über die LiteLLM-Admin-API.
-Backend: `LITELLM_BASE_URL=http://litellm:4000`, `LITELLM_API_KEY=<virtueller Key>`,
-`LLM_MODEL=openai:claude` (Name aus der Config).
+Maintain `docker/litellm/config.yaml`; virtual keys with per-tenant budgets via the LiteLLM admin
+API. Backend: `LITELLM_BASE_URL=http://litellm:4000`, `LITELLM_API_KEY=<virtual key>`,
+`LLM_MODEL=openai:claude` (the name from the config).
 
-## Skalierung / Umzug
+## Scaling / relocation
 
-- Mehr Last: API horizontal skalieren (stateless), Postgres separat betreiben (managed EU-Anbieter).
-- Enterprise-Anforderungen: Agent-Logik auf Bedrock AgentCore / Azure Foundry umziehen (Blueprint C/D);
-  Tools bleiben als MCP-Server nutzbar.
-- Strenger Datenschutz: Modelle self-hosted (vLLM) hinter derselben Provider-Abstraktion (Blueprint E).
+- More load: scale the API horizontally (it is stateless), run Postgres separately (a managed EU provider).
+- Enterprise requirements: move the agent logic to Bedrock AgentCore / Azure Foundry (blueprint C/D);
+  the tools remain usable as MCP servers.
+- Strict data protection: self-host the models (vLLM) behind the same provider abstraction (blueprint E).

@@ -1,9 +1,9 @@
-"""Legt den ersten Mandanten und Nutzer an und gibt die IDs für .env / Dev-Header aus.
+"""Creates the first tenant and user and prints the IDs for .env / dev headers.
 
-Läuft bewusst mit DATABASE_URL_MIGRATIONS (Owner/Superuser), weil ohne Mandantenkontext die
-RLS-Policies jedes Schreiben blocken würden.
+Deliberately runs with DATABASE_URL_MIGRATIONS (owner/superuser), because without a tenant
+context the RLS policies would block every write.
 
-    uv run python scripts/seed.py "Mein Mandant" me@example.com
+    uv run python scripts/seed.py "My Tenant" me@example.com
 """
 
 from __future__ import annotations
@@ -40,5 +40,5 @@ async def main(tenant_name: str, email: str) -> None:
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        sys.exit("Aufruf: python scripts/seed.py <Mandantenname> <E-Mail>")
+        sys.exit("Usage: python scripts/seed.py <tenant name> <email>")
     asyncio.run(main(sys.argv[1], sys.argv[2]))

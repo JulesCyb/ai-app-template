@@ -1,8 +1,8 @@
-"""Tool-Funktionen für Dokumente – gemeinsames Modul für Agent-Tools UND MCP-Server.
+"""Tool functions for documents — a shared module for agent tools AND the MCP server.
 
-Regel: Ein Tool bekommt den Kontext, öffnet selbst eine mandantengebundene Session, geht über das
-Repository und gibt nur das Nötige zurück (Snippet statt Volltext). Alles, was hier zurückkommt,
-landet im Prompt beim Modellanbieter.
+Rule: a tool receives the context, opens its own tenant-bound session, goes through the
+repository, and returns only what is needed (a snippet, not the full text). Everything returned
+here ends up in the prompt at the model provider.
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from app.repositories.documents import DocumentHit, DocumentRepository
 
 
 async def search_documents(ctx: RequestContext, query: str, limit: int = 5) -> list[DocumentHit]:
-    """Semantische Suche in den Dokumenten des Mandanten (RLS filtert in der DB)."""
+    """Semantic search in the tenant's documents (RLS filters in the DB)."""
     limit = max(1, min(limit, 20))
     embedding = await embed(query)
     async with tenant_session(ctx) as session:

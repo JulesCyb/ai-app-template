@@ -1,8 +1,8 @@
-"""Repository-Schicht: der einzige Weg zu den Daten.
+"""Repository layer: the only path to the data.
 
-Die Session kommt aus tenant_session(ctx) und ist damit mandantengebunden; RLS filtert in der DB.
-tenant_id wird beim Schreiben trotzdem explizit aus dem Kontext gesetzt (WITH CHECK der Policy
-lehnt alles andere ab).
+The session comes from tenant_session(ctx) and is therefore tenant-bound; RLS filters in the DB.
+On writes, tenant_id is still set explicitly from the context (the policy's WITH CHECK rejects
+anything else).
 """
 
 from __future__ import annotations

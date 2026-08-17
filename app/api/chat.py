@@ -1,7 +1,7 @@
-"""Chat-Endpunkt im Vercel-AI-SDK-Format.
+"""Chat endpoint in the Vercel AI SDK format.
 
-Ein Next.js-Frontend mit `useChat` (Vercel AI SDK) kann direkt gegen POST /api/chat sprechen –
-PydanticAI übersetzt Nachrichten und Stream (inkl. Tool-Events). Siehe docs/frontend.md.
+A Next.js frontend using `useChat` (Vercel AI SDK) can talk directly to POST /api/chat —
+PydanticAI translates messages and stream (incl. tool events). See docs/frontend.md.
 """
 
 from __future__ import annotations

@@ -1,12 +1,12 @@
-"""Grundschema: tenants, users, documents (pgvector) mit Row-Level Security.
+"""Base schema: tenants, users, documents (pgvector) with Row-Level Security.
 
 Revision ID: 0001
 Revises:
 Create Date: 2026-08-17
 
-Rollen: Migrationen laufen als Owner (DATABASE_URL_MIGRATIONS). Die App verbindet sich als
-Rolle `app` (kein Superuser, NOBYPASSRLS – angelegt in docker/postgres/01-init.sh). Superuser
-umgehen RLS immer; deshalb darf die App nie als Superuser laufen.
+Roles: migrations run as the owner (DATABASE_URL_MIGRATIONS). The app connects as the `app`
+role (no superuser, NOBYPASSRLS — created in docker/postgres/01-init.sh). Superusers always
+bypass RLS; that is why the app must never run as one.
 """
 
 from collections.abc import Sequence
@@ -83,13 +83,13 @@ def upgrade() -> None:
         """
     )
     op.execute("CREATE INDEX documents_tenant_idx ON documents (tenant_id)")
-    # Vektor-Index erst ab einigen zehntausend Zeilen nötig; dann z. B.:
+    # A vector index is only needed from a few tens of thousands of rows; then e.g.:
     # CREATE INDEX documents_embedding_idx ON documents USING hnsw (embedding vector_cosine_ops)
 
     for table in TENANT_TABLES:
         _rls(table)
 
-    # Rechte für die App-Rolle (existiert nur, wenn 01-init.sh gelaufen ist – sonst überspringen).
+    # Grants for the app role (exists only if 01-init.sh has run — skip otherwise).
     op.execute(
         """
         DO $$

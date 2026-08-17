@@ -30,7 +30,7 @@ services:
       - "8000:8000"
     command: sh -c "uv run alembic upgrade head && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000"
 
-  # Optional: Modell-Gateway. Start mit `docker compose --profile gateway up -d`
+  # Optional: model gateway. Start with `docker compose --profile gateway up -d`
   litellm:
     image: ghcr.io/berriai/litellm:main-stable
     profiles: ["gateway"]
@@ -41,8 +41,8 @@ services:
     ports:
       - "4000:4000"
 
-  # Langfuse (v3) braucht ClickHouse, Redis und MinIO: die offizielle docker-compose.yml von
-  # https://github.com/langfuse/langfuse einbinden (docs/deployment.md), nicht hier nachbauen.
+  # Langfuse (v3) needs ClickHouse, Redis, and MinIO: include the official docker-compose.yml from
+  # https://github.com/langfuse/langfuse (docs/deployment.md) instead of rebuilding it here.
 
 volumes:
   pgdata:

@@ -1,16 +1,16 @@
-"""MCP-Server mit denselben Tool-Funktionen wie das Backend (app/tools/*).
+"""MCP server exposing the same tool functions as the backend (app/tools/*).
 
-Nutzen: Claude Code / Claude Desktop beim Entwickeln, später Managed-Plattformen – ohne die
-Tools neu zu schreiben.
+Payoff: Claude Code / Claude Desktop during development, managed platforms later — without
+rewriting the tools.
 
-Kontext: In Produktion kommt der Mandanten-/Nutzerkontext aus der Authentifizierung der
-MCP-Verbindung (OAuth/Token). Für lokale Entwicklung aus MCP_TENANT_ID / MCP_USER_ID.
+Context: in production, the tenant/user context comes from the MCP connection's
+authentication (OAuth/token). For local development, from MCP_TENANT_ID / MCP_USER_ID.
 
-Start (stdio, z. B. in .mcp.json von Claude Code):
+Start (stdio, e.g. in Claude Code's .mcp.json):
     uv run python -m app.mcp.server
 
-Hinweis Aktualität: MCP-Python-SDK 2.x -> `from mcp.server.mcpserver import MCPServer`
-(vorher `from mcp.server.fastmcp import FastMCP`). Bei SDK-Updates prüfen.
+Freshness note: MCP Python SDK 2.x -> `from mcp.server.mcpserver import MCPServer`
+(previously `from mcp.server.fastmcp import FastMCP`). Check on SDK updates.
 """
 
 from __future__ import annotations
@@ -25,20 +25,20 @@ from app.tools import documents as document_tools
 
 server = MCPServer(
     name="ai-app-tools",
-    instructions="Werkzeuge der Anwendung: semantische Suche in den Dokumenten des Mandanten.",
+    instructions="This application's tools: semantic search in the tenant's documents.",
 )
 
 
 def _context_from_env() -> RequestContext:
     s = get_settings()
     if not (s.mcp_tenant_id and s.mcp_user_id):
-        raise RuntimeError("MCP_TENANT_ID und MCP_USER_ID setzen (nur Entwicklung).")
+        raise RuntimeError("Set MCP_TENANT_ID and MCP_USER_ID (development only).")
     return RequestContext(tenant_id=UUID(s.mcp_tenant_id), user_id=UUID(s.mcp_user_id))
 
 
 @server.tool()
 async def search_documents(query: str, limit: int = 5) -> list[dict]:
-    """Semantische Suche in den Dokumenten des aktuellen Mandanten."""
+    """Semantic search in the current tenant's documents."""
     hits = await document_tools.search_documents(_context_from_env(), query, limit)
     return [hit.model_dump(mode="json") for hit in hits]
 

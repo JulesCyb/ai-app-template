@@ -1,4 +1,4 @@
-"""API-Tests über ASGI, Auth im dev-headers-Modus, Suche und Modell ersetzt."""
+"""API tests via ASGI, auth in dev-headers mode, search and model replaced."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from app.main import app
 
 @pytest.fixture
 def client(monkeypatch, fake_search, test_model):
-    # Suche ohne DB: AssistantDeps löst den Default zur Laufzeit auf -> Fake einsetzen.
+    # Search without a DB: AssistantDeps resolves the default at runtime -> inject the fake.
     monkeypatch.setattr(assistant_module.document_tools, "search_documents", fake_search)
     transport = httpx.ASGITransport(app=app)
     return httpx.AsyncClient(transport=transport, base_url="http://test")
@@ -37,7 +37,7 @@ async def test_run_with_context(client, calls):
     async with client:
         response = await client.post(
             "/agents/assistant/run",
-            json={"prompt": "Was steht im Vertrag?"},
+            json={"prompt": "What does the contract say?"},
             headers={"X-Tenant-Id": str(tenant_id), "X-User-Id": str(user_id)},
         )
     assert response.status_code == 200, response.text

@@ -1,31 +1,31 @@
-# Mobile-App anbinden (Android/iOS)
+# Attaching a mobile app (Android/iOS)
 
-Die App ist ein weiterer Client derselben API – Agent-Logik, Tools, RLS und Modell-Zugang bleiben
-unverändert. Entscheidung und Optionen: Skill `ai-app-architecture`, Abschnitt "Mobile Clients"
-und ADR-Vorlage `0005-mobile.md`.
+The app is another client of the same API — agent logic, tools, RLS, and model access stay
+unchanged. Decision and options: the `ai-app-blueprints` skill, section "Mobile clients"
+and ADR template `0005-mobile.md`.
 
-## Wege (in dieser Reihenfolge prüfen)
+## Paths (check in this order)
 
-1. **PWA / verpackte Web-App** (Capacitor, Trusted Web Activity): das Next.js-Frontend als
-   installierbare App – billigster Test, für interne Tools oft genug.
-2. **Expo / React Native**: gleiche Sprache wie das Web-Frontend; das Vercel AI SDK läuft auch in
-   React Native und spricht gegen `POST /api/chat`. Monorepo mit geteiltem Paket (Typen, Hooks,
-   API-Client aus dem OpenAPI-Schema unter `/openapi.json`).
-3. **Nativ (Kotlin/Compose)**: nur mit Grund – tiefe OS-Integration, natives Team.
+1. **PWA / packaged web app** (Capacitor, Trusted Web Activity): the Next.js frontend as an
+   installable app — the cheapest test, often enough for internal tools.
+2. **Expo / React Native**: same language as the web frontend; the Vercel AI SDK also runs in
+   React Native and talks to `POST /api/chat`. Monorepo with a shared package (types, hooks,
+   API client generated from the OpenAPI schema at `/openapi.json`).
+3. **Native (Kotlin/Compose)**: only with a reason — deep OS integration, a native team.
 
-## Backend-Pflichten vor der ersten App-Version
+## Backend duties before the first app release
 
-- `AUTH_MODE=jwt` in `app/deps.py` implementieren: OIDC + PKCE mit einem Identity-Provider,
-  kurzlebige Access-Tokens, Refresh-Tokens, Widerruf. Die Dev-Header sind auf dem Gerät tabu.
-- API-Verträge einfrieren: `/v1/`-Präfix, keine Breaking Changes, `/openapi.json` als Vertrag,
-  Client generieren (z. B. `openapi-typescript`), Deprecation-Fenster.
-- Lange Agent-Läufe als Jobs: `POST /v1/jobs` → Status-Endpunkt oder Push → Ergebnis in der DB
-  (Tabelle mit `tenant_id` + RLS). SSE-Stream nur für den Chat.
-- Uploads über signierte URLs auf den Objektspeicher (Tenant-Prefix), Verarbeitung serverseitig.
-- Push (FCM/APNs): Gerätetokens pro Nutzer mit `tenant_id`; keine Inhalte im Payload.
-- Rate-Limits pro Nutzer; Play Integrity / App Attest nur bei Bedarf.
+- Implement `AUTH_MODE=jwt` in `app/deps.py`: OIDC + PKCE with an identity provider,
+  short-lived access tokens, refresh tokens, revocation. The dev headers are off-limits on a device.
+- Freeze API contracts: `/v1/` prefix, no breaking changes, `/openapi.json` as the contract,
+  generate a client (e.g. `openapi-typescript`), keep a deprecation window.
+- Long agent runs as jobs: `POST /v1/jobs` → status endpoint or push → result in the DB
+  (a table with `tenant_id` + RLS). SSE streaming only for chat.
+- Uploads via signed URLs to object storage (tenant prefix), processing server-side.
+- Push (FCM/APNs): device tokens per user with `tenant_id`; no content in payloads.
+- Per-user rate limits; Play Integrity / App Attest only when needed.
 
-## Was nicht nötig ist
+## What is not needed
 
-KI auf dem Gerät. Modelle bleiben hinter der API; On-Device-Modelle sind höchstens später eine
-Ergänzung für Offline-Kleinkram.
+AI on the device. Models stay behind the API; on-device models are at most a later addition
+for small offline tasks.

@@ -1,7 +1,7 @@
-"""Zentrale Konfiguration. Werte kommen aus der Umgebung bzw. .env (siehe .env.example).
+"""Central configuration. Values come from the environment or .env (see .env.example).
 
-Mandantenspezifisches (Modellwahl, Prompts, Limits) gehört NICHT hierher, sondern in
-tenants.settings – hier stehen nur prozessweite Einstellungen.
+Tenant-specific things (model choice, prompts, limits) do NOT belong here — they live in
+tenants.settings. This holds process-wide settings only.
 """
 
 from functools import lru_cache

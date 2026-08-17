@@ -1,6 +1,6 @@
 #!/bin/bash
-# Legt die App-Rolle an: kein Superuser, kein BYPASSRLS – sonst greift Row-Level Security nicht.
-# Läuft einmalig beim ersten Start des Postgres-Containers.
+# Creates the app role: no superuser, no BYPASSRLS — otherwise Row-Level Security does not apply.
+# Runs once on the first start of the Postgres container.
 set -e
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
     CREATE ROLE app LOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE PASSWORD '${APP_DB_PASSWORD}';

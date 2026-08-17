@@ -4,8 +4,8 @@ Revision ID: ${up_revision}
 Revises: ${down_revision | comma,n}
 Create Date: ${create_date}
 
-Checkliste für neue Tabellen: tenant_id NOT NULL REFERENCES tenants(id) + Index,
-ENABLE + FORCE ROW LEVEL SECURITY, Policy mit USING und WITH CHECK, GRANT an Rolle app.
+Checklist for new tables: tenant_id NOT NULL REFERENCES tenants(id) + index,
+ENABLE + FORCE ROW LEVEL SECURITY, a policy with USING and WITH CHECK, GRANT to the app role.
 """
 from typing import Sequence, Union
 

@@ -1,13 +1,13 @@
-# LiteLLM-Gateway: ein OpenAI-kompatibler Endpunkt für alle Anbieter.
-# Modellnamen hier definieren und in LLM_MODEL als "openai:<name>" mit LITELLM_BASE_URL verwenden.
+# LiteLLM gateway: one OpenAI-compatible endpoint for all providers.
+# Define model names here and use them in LLM_MODEL as "openai:<name>" with LITELLM_BASE_URL set.
 model_list:
   - model_name: claude
     litellm_params:
-      model: anthropic/claude-sonnet-4-5        # aktuelles Modell eintragen
+      model: anthropic/claude-sonnet-4-5        # use a current model
       api_key: os.environ/ANTHROPIC_API_KEY
   - model_name: claude-eu
     litellm_params:
-      model: bedrock/anthropic.claude-sonnet-4-5  # Bedrock-Modell-ID prüfen
+      model: bedrock/anthropic.claude-sonnet-4-5  # verify the Bedrock model ID
       aws_region_name: eu-central-1
   - model_name: embeddings
     litellm_params:
@@ -16,7 +16,7 @@ model_list:
 
 litellm_settings:
   drop_params: true
-  # Langfuse-Callback optional: success_callback: ["langfuse"]
+  # Langfuse callback, optional: success_callback: ["langfuse"]
 
 general_settings:
-  master_key: os.environ/LITELLM_MASTER_KEY   # virtuelle Keys/Budgets pro Mandant über die LiteLLM-API
+  master_key: os.environ/LITELLM_MASTER_KEY   # virtual keys/budgets per tenant via the LiteLLM API

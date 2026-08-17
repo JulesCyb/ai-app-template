@@ -1,4 +1,4 @@
-"""FastAPI-App: Agent-Backend als API.
+"""FastAPI app: the agent backend as an API.
 
 Start: uv run uvicorn app.main:app --reload
 """

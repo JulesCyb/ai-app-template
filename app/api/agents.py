@@ -1,6 +1,6 @@
-"""Agent-Endpunkte: einmalige Antwort und Text-Stream (SSE).
+"""Agent endpoints: one-shot answer and text stream (SSE).
 
-Für eine Vercel-AI-SDK-Chat-UI siehe app/api/chat.py.
+For a Vercel AI SDK chat UI, see app/api/chat.py.
 """
 
 from __future__ import annotations

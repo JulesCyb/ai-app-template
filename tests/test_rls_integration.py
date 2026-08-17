@@ -1,7 +1,7 @@
-"""Echter Isolationstest gegen PostgreSQL + pgvector (Paket `pgserver`, `uv sync --group dbtest`).
+"""Real isolation test against PostgreSQL + pgvector (package `pgserver`, `uv sync --group dbtest`).
 
-Prüft, was die Unit-Tests nicht können: dass die RLS-Policies aus der Migration greifen, wenn die
-App als Rolle `app` (kein Superuser, NOBYPASSRLS) arbeitet.
+Verifies what the unit tests cannot: that the RLS policies from the migration apply when the
+app works as the `app` role (no superuser, NOBYPASSRLS).
 """
 
 from __future__ import annotations
@@ -69,7 +69,7 @@ def app_settings(database_urls, monkeypatch):
 
 
 async def _seed(url: str) -> tuple[uuid.UUID, uuid.UUID]:
-    """Zwei Mandanten mit je einem Dokument – als Owner, weil ohne Kontext RLS alles blockt."""
+    """Two tenants with one document each — as the owner, because without context RLS blocks everything."""
     engine = create_async_engine(url)
     tenant_a, tenant_b = uuid.uuid4(), uuid.uuid4()
     async with engine.begin() as conn:
@@ -85,8 +85,8 @@ async def _seed(url: str) -> tuple[uuid.UUID, uuid.UUID]:
                 ),
                 {
                     "tid": tenant_id,
-                    "title": f"Dokument {name}",
-                    "content": f"Inhalt von Mandant {name}",
+                    "title": f"Document {name}",
+                    "content": f"Content of tenant {name}",
                     "emb": _vec(seed),
                 },
             )
@@ -106,12 +106,12 @@ async def test_search_sees_only_own_tenant(app_settings, database_urls):
     ctx_a = RequestContext(tenant_id=tenant_a, user_id=uuid.uuid4())
     async with tenant_session(ctx_a) as session:
         hits = await DocumentRepository().search(session, query, limit=10)
-    assert [h.title for h in hits] == ["Dokument A"]
+    assert [h.title for h in hits] == ["Document A"]
 
     ctx_b = RequestContext(tenant_id=tenant_b, user_id=uuid.uuid4())
     async with tenant_session(ctx_b) as session:
         hits = await DocumentRepository().search(session, query, limit=10)
-    assert [h.title for h in hits] == ["Dokument B"]
+    assert [h.title for h in hits] == ["Document B"]
 
 
 async def test_insert_for_other_tenant_is_rejected(app_settings, database_urls):
@@ -127,14 +127,14 @@ async def test_insert_for_other_tenant_is_rejected(app_settings, database_urls):
             await session.execute(
                 text(
                     "INSERT INTO documents (tenant_id, title, content) "
-                    "VALUES (:tid, 'fremd', 'darf nicht')"
+                    "VALUES (:tid, 'foreign', 'must not work')"
                 ),
                 {"tid": tenant_b},
             )
 
 
 async def test_no_context_means_no_rows(app_settings, database_urls):
-    """Ohne set_config liefert current_setting NULL -> Policy blockt alles (App-Rolle)."""
+    """Without set_config, current_setting returns NULL -> the policy blocks everything (app role)."""
     await _seed(database_urls["migrations"])
     engine = create_async_engine(database_urls["app"])
     async with engine.connect() as conn:
